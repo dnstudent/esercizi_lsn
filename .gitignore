@@ -1,0 +1,7 @@
+# Project exclude paths
+/cmake-build-*/
+/.idea/
+/.vscode/
+*.pdf
+LSN_Exercises_*.ipynb
+*.ipynb_checkpoints

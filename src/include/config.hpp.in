@@ -1,0 +1,11 @@
+#pragma once
+
+#define DEFAULT_OUTPUT "@CMAKE_OUT_DIR@/"
+#define DEFAULT_SAMPLE_SIZE 1E6
+#define DEFAULT_N_BLOCKS 1E2
+#define SEEDS_PATH "@CMAKE_SOURCE_DIR@/data/seeds/"
+#define PRIMES_PATH "@CMAKE_SOURCE_DIR@/data/primes/"
+#define LATTICES_PATH "@CMAKE_SOURCE_DIR@/data/lattices/"
+#define MD_PATH "@CMAKE_SOURCE_DIR@/data/molecular_configs/"
+#define ISING_PATH "@CMAKE_SOURCE_DIR@/data/ising/"
+#define TSP_PATH "@CMAKE_SOURCE_DIR@/data/paths/"
