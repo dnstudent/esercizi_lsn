@@ -6,3 +6,4 @@
 *.pdf
 LSN_Exercises_*.ipynb
 *.ipynb_checkpoints
+/src/include/config.hpp
