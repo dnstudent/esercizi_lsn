@@ -2,8 +2,10 @@
 /cmake-build-*/
 /.idea/
 /.vscode/
+/bin/
+/profiling/
+/install/
 /src/include/config.hpp
 *.pdf
 LSN_Exercises_*.ipynb
 *.ipynb_checkpoints
-/src/include/config.hpp
