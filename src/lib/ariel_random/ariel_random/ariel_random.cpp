@@ -112,6 +112,17 @@ ARandom::ARandom(const std::string_view &seeds_source, const std::string_view &p
         throw std::runtime_error("Could not open " + std::string(seeds_source));
     }
 }
+void ARandom::seed() {
+    m_n1 = 0UL;
+    m_n2 = 0UL;
+    m_n3 = 2892UL;
+    m_n4 = 2587UL;
+    m_l1 = 0UL;
+    m_l2 = 0UL;
+    m_l3 = 0UL;
+    m_l4 = 1UL;
+}
+void ARandom::seed(ARandom::result_type s) { b10tob4096(s, &m_l1, &m_l2, &m_l3, &m_l4); }
 
 /****************************************************************
 *****************************************************************

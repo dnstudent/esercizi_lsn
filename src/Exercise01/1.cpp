@@ -2,7 +2,6 @@
 // Created by Davide Nicoli on 16/03/22.
 //
 
-#include <algorithm>
 #include <cmath>
 #include <functional>
 #include <iostream>
@@ -16,6 +15,7 @@
 
 #include "ariel_random/ariel_random.hpp"
 #include "config.hpp"
+#include "estimators/chi2.hpp"
 #include "estimators/estimators.hpp"
 #include "estimators/mean.hpp"
 #include "estimators/variance.hpp"
@@ -25,6 +25,7 @@
 
 using estimators::StatefulMean;
 using estimators::StatefulVariance;
+using estimators::UniformChi2;
 using std::string;
 typedef double value;
 typedef std::vector<value> block_stats;
@@ -35,7 +36,7 @@ int main(int argc, char *argv[]) {
     cxxopts::Options options("01_1", "How to run exercise 01.1");
     // clang-format off
     options.add_options("Program")
-      ("o,out", "Output path", co::value<string>()->default_value(RESULTS_DIR "01_1.csv"));
+      ("o,out", "Output path", co::value<string>()->default_value(RESULTS_DIR));
     options.add_options("Rng seeding")
       ("p,primes_path", "Prime numbers path", co::value<string>()->default_value(PRIMES_PATH "Primes"))
       ("l,primes_line", "Line in primes_path to use", co::value<size_t>()->default_value("0"))
@@ -45,8 +46,9 @@ int main(int argc, char *argv[]) {
       ("m,block_size", "Number of samples per block", co::value<size_t>()->default_value("1000"))
       ("n,n_blocks", "Number of blocks", co::value<size_t>()->default_value("100"));
     options.add_options("Pearson X statistic")
-      ("N,n_samples", "Number of samples", co::value<size_t>()->default_value("1000000"))
-      ("k,n_intervals", "Number of intervals for the Pearson X statistics", co::value<size_t>()->default_value("100"));
+      ("n_trials", "Number of trials", co::value<size_t>()->default_value("100"))
+      ("n_samples", "Number of samples", co::value<size_t>()->default_value("10000"))
+      ("n_intervals", "Number of intervals for the Pearson X statistics", co::value<size_t>()->default_value("100"));
     // clang-format on
     auto user_params = options.parse(argc, argv);
     if (user_params.count("help")) {
@@ -56,8 +58,9 @@ int main(int argc, char *argv[]) {
 
     const size_t BLOCK_SIZE = user_params["m"].as<size_t>();
     const size_t N_BLOCKS = user_params["n"].as<size_t>();
-    const size_t N_X_SAMPLES = user_params["N"].as<size_t>();
-    const size_t N_INTERVALS = user_params["k"].as<size_t>();
+    const size_t N_TRIALS = user_params["n_trials"].as<size_t>();
+    const size_t N_X_SAMPLES = user_params["n_samples"].as<size_t>();
+    const size_t N_INTERVALS = user_params["n_intervals"].as<size_t>();
     const string OUTPUT_PATH = user_params["o"].as<string>();
     const string PRIMES_SOURCE = user_params["p"].as<string>();
     const size_t PRIMES_LINE = user_params["l"].as<size_t>();
@@ -100,35 +103,47 @@ int main(int argc, char *argv[]) {
 
     // Storing results in a csv document
     rapidcsv::Document table;
-    table.SetColumn(0, blocks);
-    table.SetColumnName(0, "block");
-    table.InsertColumn(1, mean_estimate, "mean_estimate");
-    table.InsertColumn(2, mean_uncert, "mean_error");
-    table.InsertColumn(3, var_estimate, "variance_estimate");
-    table.InsertColumn(4, var_uncert, "variance_error");
-    table.Save(OUTPUT_PATH);
+    table.SetColumn(0, mean_estimate);
+    table.SetColumnName(0, "mean_estimate");
+    table.InsertColumn(1, mean_uncert, "mean_error");
+    table.InsertColumn(2, var_estimate, "variance_estimate");
+    table.InsertColumn(3, var_uncert, "variance_error");
+    table.Save(OUTPUT_PATH + "/01_1_stats.csv");
 
     /*-----------------------
      * X^2 Pearson statistics
      -----------------------*/
-    std::mt19937_64 g;
-    std::uniform_int_distribution<size_t> int_sampler(0, N_INTERVALS - 1);
-    std::vector<size_t> O_histogram(N_INTERVALS, 0);
-    for (size_t i = 0UL; i < N_X_SAMPLES; i++) {
-        //        O_histogram[size_t(std::floor(rng.Rannyu(0, double(N_INTERVALS))))]++;
-        O_histogram[int_sampler(rng)]++;
-    }
-    const value expected_value = value(N_X_SAMPLES) / value(N_INTERVALS);
-    //    const value variance =
-    //            value(N_X_SAMPLES) * (value(N_INTERVALS - 1) / value(N_INTERVALS)) / value(N_INTERVALS);
-    auto chi2 = std::transform_reduce(O_histogram.cbegin(), O_histogram.cend(), value(0),
-                                      std::plus<>(), [=](const auto Oi) {
-                                          auto num = value(Oi) - expected_value;
-                                          return num * num / expected_value;
-                                      });
 
-    std::cout << "Pearson's X statistic was " << chi2 << " against a number of intervals of "
-              << N_INTERVALS << std::endl;
+
+    // vector storing the results
+    std::vector<value> chi2(N_TRIALS);
+    // buffer storing each trial's empirical distribution
+    std::vector<size_t> O_histogram(N_INTERVALS);
+
+    // expected value for the X^2 statistic
+    const value expected_value = value(N_X_SAMPLES) / value(N_INTERVALS);
+
+// It seems Apple ARM libc++ has a bug in std::uniform_int_distribution which produces erroneous results. Other compilers/stdlibs/OSes were unaffected
+// The following macro prevents the code between "#ifndef" and "#endif" from being compiled.
+#ifndef __apple_build_version__
+    std::uniform_int_distribution<size_t> int_sampler(0, N_INTERVALS - 1);
+#endif
+    std::generate(chi2.begin(), chi2.end(), [&]() {
+        std::fill(O_histogram.begin(), O_histogram.end(), 0UL);
+        for (size_t i = 0UL; i < N_X_SAMPLES; i++) {
+#ifndef __apple_build_version__
+            O_histogram[int_sampler(rng)]++;
+#else
+                        O_histogram[size_t(std::floor(rng.Rannyu(0, double(N_INTERVALS))))]++;
+#endif
+        }
+        return UniformChi2<value>(expected_value)(O_histogram.cbegin(), O_histogram.cend());
+    });
+
+    rapidcsv::Document chi_table;
+    chi_table.SetColumn(0, chi2);
+    chi_table.SetColumnName(0, "X^2");
+    chi_table.Save(OUTPUT_PATH + "/01_1_chi.csv");
 
     return 0;
 }

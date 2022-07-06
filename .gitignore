@@ -5,6 +5,7 @@
 /bin/
 /profiling/
 /install/
+/sanitize/
 /src/include/config.hpp
 *.pdf
 LSN_Exercises_*.ipynb
