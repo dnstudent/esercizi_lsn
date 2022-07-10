@@ -27,7 +27,8 @@ target_compile_options(project_warnings
         -Wdouble-promotion
         -Wformat=2
         -Werror
-        -Wno-unused-variable)
+        -Wno-unused-variable
+        -Wno-psabi)
 
 
 add_subdirectory(src)

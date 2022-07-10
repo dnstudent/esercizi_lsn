@@ -12,3 +12,4 @@ configure_file(
 add_subdirectory(extern)
 add_subdirectory(lib)
 add_subdirectory(Exercise01)
+add_subdirectory(Exercise02)
