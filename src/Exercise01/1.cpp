@@ -3,6 +3,7 @@
 //
 
 #include <cmath>
+#include <filesystem>
 #include <functional>
 #include <iostream>
 #include <iterator>
@@ -15,13 +16,15 @@
 
 #include "ariel_random/ariel_random.hpp"
 #include "config.hpp"
+#include "distributions/uniform_int.hpp"
 #include "estimators/chi2.hpp"
 #include "estimators/estimators.hpp"
 #include "estimators/mean.hpp"
 #include "estimators/variance.hpp"
 #include "utils.hpp"
 
-//#define BLOCK_SIZE 1000
+#define SECTION "01"
+#define EXERCISE SECTION "_1"
 
 using estimators::StatefulMean;
 using estimators::StatefulVariance;
@@ -30,13 +33,15 @@ using std::string;
 typedef double value;
 typedef std::vector<value> block_stats;
 namespace co = cxxopts;
+namespace fs = std::filesystem;
 
 int main(int argc, char *argv[]) {
     // Defining some flags to control the program output
-    cxxopts::Options options("01_1", "How to run exercise 01.1");
+    cxxopts::Options options(EXERCISE, "How to run exercise " EXERCISE);
     // clang-format off
     options.add_options("Program")
-      ("o,out", "Output path", co::value<string>()->default_value(RESULTS_DIR));
+      ("out1", "Mean and variance estimates output path", co::value<fs::path>()->default_value(RESULTS_DIR "/" SECTION "/" EXERCISE "_stats.csv"))
+      ("out2", "Chi2 statistic output path", co::value<fs::path>()->default_value(RESULTS_DIR "/" SECTION "/"  EXERCISE "_chi.csv"));
     options.add_options("Rng seeding")
       ("p,primes_path", "Prime numbers path", co::value<string>()->default_value(PRIMES_PATH "Primes"))
       ("l,primes_line", "Line in primes_path to use", co::value<size_t>()->default_value("0"))
@@ -61,7 +66,8 @@ int main(int argc, char *argv[]) {
     const size_t N_TRIALS = user_params["n_trials"].as<size_t>();
     const size_t N_X_SAMPLES = user_params["n_samples"].as<size_t>();
     const size_t N_INTERVALS = user_params["n_intervals"].as<size_t>();
-    const string OUTPUT_PATH = user_params["o"].as<string>();
+    const auto EST_OUTPUT_PATH = user_params["out1"].as<fs::path>();
+    const auto CHI_OUTPUT_PATH = user_params["out2"].as<fs::path>();
     const string PRIMES_SOURCE = user_params["p"].as<string>();
     const size_t PRIMES_LINE = user_params["l"].as<size_t>();
     const string SEEDS_SOURCE = user_params["s"].as<string>();
@@ -108,7 +114,11 @@ int main(int argc, char *argv[]) {
     table.InsertColumn(1, mean_uncert, "mean_error");
     table.InsertColumn(2, var_estimate, "variance_estimate");
     table.InsertColumn(3, var_uncert, "variance_error");
-    table.Save(OUTPUT_PATH + "/01_1_stats.csv");
+
+    if (!fs::exists(EST_OUTPUT_PATH.parent_path())) {
+        fs::create_directories(EST_OUTPUT_PATH.parent_path());
+    }
+    table.Save(EST_OUTPUT_PATH);
 
     /*-----------------------
      * X^2 Pearson statistics
@@ -123,27 +133,23 @@ int main(int argc, char *argv[]) {
     // expected value for the X^2 statistic
     const value expected_value = value(N_X_SAMPLES) / value(N_INTERVALS);
 
-// It seems Apple ARM libc++ has a bug in std::uniform_int_distribution which produces erroneous results. Other compilers/stdlibs/OSes were unaffected
-// The following macro prevents the code between "#ifndef" and "#endif" from being compiled.
-#ifndef __apple_build_version__
-    std::uniform_int_distribution<size_t> int_sampler(0, N_INTERVALS - 1);
-#endif
+    // It seems Apple ARM libc++ has a bug in std::uniform_int_distribution which produces erroneous results. Other compilers/stdlibs/OSes were unaffected
+    // The following macro prevents the code between "#ifndef" and "#endif" from being compiled.
+    distributions::uniform_int<size_t> int_sampler(0, N_INTERVALS - 1);
     std::generate(chi2.begin(), chi2.end(), [&]() {
         std::fill(O_histogram.begin(), O_histogram.end(), 0UL);
-        for (size_t i = 0UL; i < N_X_SAMPLES; i++) {
-#ifndef __apple_build_version__
-            O_histogram[int_sampler(rng)]++;
-#else
-                        O_histogram[size_t(std::floor(rng.Rannyu(0, double(N_INTERVALS))))]++;
-#endif
-        }
+        for (size_t i = 0UL; i < N_X_SAMPLES; i++) { O_histogram[int_sampler(rng)]++; }
         return UniformChi2<value>(expected_value)(O_histogram.cbegin(), O_histogram.cend());
     });
 
     rapidcsv::Document chi_table;
     chi_table.SetColumn(0, chi2);
     chi_table.SetColumnName(0, "X^2");
-    chi_table.Save(OUTPUT_PATH + "/01_1_chi.csv");
+
+    if (!fs::exists(CHI_OUTPUT_PATH.parent_path())) {
+        fs::create_directories(CHI_OUTPUT_PATH.parent_path());
+    }
+    chi_table.Save(CHI_OUTPUT_PATH);
 
     return 0;
 }
