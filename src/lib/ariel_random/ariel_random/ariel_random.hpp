@@ -81,11 +81,9 @@ public:
      */
     void SetRandom(result_type const *seed, result_type prime3, result_type prime4);
     void SaveSeed() const;
-#ifdef __apple_build_version__
     [[maybe_unused]] double Rannyu();
     [[maybe_unused]] double Rannyu(double min, double max);
     [[maybe_unused]] double Gauss(double mean, double sigma);
-#endif
 
 private:
     // multiplyer in base 2^12

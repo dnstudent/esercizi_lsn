@@ -92,7 +92,6 @@ ARandom::result_type ARandom ::operator()() {
     WriteSeed.close();
 }
 
-#ifdef __apple_build_version__
 [[maybe_unused]] double ARandom ::Gauss(double mean, double sigma) {
     double s = Rannyu();
     double t = Rannyu();
@@ -103,10 +102,10 @@ ARandom::result_type ARandom ::operator()() {
 double ARandom ::Rannyu(double min, double max) { return min + (max - min) * Rannyu(); }
 
 double ARandom ::Rannyu() {
-    int i1 = m_l1 * m_m4 + m_l2 * m_m3 + m_l3 * m_m2 + m_l4 * m_m1 + m_p1;
-    int i2 = m_l2 * m_m4 + m_l3 * m_m3 + m_l4 * m_m2 + m_p2;
-    int i3 = m_l3 * m_m4 + m_l4 * m_m3 + m_p3;
-    int i4 = m_l4 * m_m4 + m_p4;
+    result_type i1 = m_l1 * m_m4 + m_l2 * m_m3 + m_l3 * m_m2 + m_l4 * m_m1 + m_p1;
+    result_type i2 = m_l2 * m_m4 + m_l3 * m_m3 + m_l4 * m_m2 + m_p2;
+    result_type i3 = m_l3 * m_m4 + m_l4 * m_m3 + m_p3;
+    result_type i4 = m_l4 * m_m4 + m_p4;
     m_l4 = i4 % 4096;
     i3 = i3 + i4 / 4096;
     m_l3 = i3 % 4096;
@@ -116,7 +115,6 @@ double ARandom ::Rannyu() {
     return twom12 * (double(m_l1) +
                      twom12 * (double(m_l2) + twom12 * (double(m_l3) + twom12 * double(m_l4))));
 }
-#endif
 
 [[maybe_unused]] void ARandom ::SetRandom(result_type const *s, result_type p1, result_type p2) {
     m_l1 = s[0];

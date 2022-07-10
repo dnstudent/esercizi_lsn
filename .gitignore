@@ -3,10 +3,13 @@
 /.idea/
 /.vscode/
 /bin/
+/lib/
 /profiling/
 /install/
 /sanitize/
+/results/
 /src/include/config.hpp
 *.pdf
 LSN_Exercises_*.ipynb
 *.ipynb_checkpoints
+*.code-workspace

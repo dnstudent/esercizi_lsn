@@ -30,6 +30,7 @@ namespace estimators {
             store_estimates<I + 1>(first, last, estimators, outs...);
         }
     }
+
 }// namespace estimators
 
 #endif
