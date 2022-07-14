@@ -15,7 +15,7 @@ namespace utils {
         using diff_t = typename std::iterator_traits<It>::difference_type;
         return std::next(it, static_cast<diff_t>(N));
     }
-    
+
     template<typename InputIt, typename OutputIt>
     constexpr OutputIt partial_average(InputIt first, InputIt last, OutputIt d_first) {
         if (first == last) { return d_first; }
@@ -72,7 +72,7 @@ namespace utils {
 
     template<typename Vector>
     constexpr typename Vector::value_type norm2(const Vector &v) {
-        return std::transform_reduce(v.cbegin(), v.cend(), v.cbegin(),
+        return std::transform_reduce(std::begin(v), std::end(v), std::begin(v),
                                      typename Vector::value_type(0));
     }
 

@@ -2,6 +2,7 @@
 cxxopts/3.0.0
 rapidcsv/8.62
 catch2/3.0.1
+indicators/2.2
 
 [generators]
 cmake
