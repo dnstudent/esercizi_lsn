@@ -77,6 +77,12 @@ namespace estimators {
             return {mean_estimate, std::sqrt(variance_estimate / value(m_current_block - 1))};
         }
 
+        void reset() {
+            m_current_block = 0;
+            m_running_sum = 0;
+            m_running_sum2 = 0;
+        }
+
     protected:
         // Index of the currently processed block
         size_t m_current_block{0};
