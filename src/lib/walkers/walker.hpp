@@ -12,13 +12,12 @@
 
 /**
  * Defines a walker with instruction on how to sample a step and utilities to perform a random walk. The lattice lays on NumericField^N.
- * @tparam NumericField The numeric field to which lattice points belongs.
+ * @tparam Field The numeric field to which lattice points belongs.
  */
-template<typename NumericField, typename StepDistribution>
+template<typename Field, typename StepDistribution>
 class Walker {
 public:
-    typedef NumericField field;
-    typedef std::valarray<field> point;
+    typedef Field point;
 
     Walker(point &&start, StepDistribution &&step_distribution)
         : m_current{std::forward<point>(start)}, m_stepdist{std::forward<StepDistribution>(

@@ -5,7 +5,6 @@
 #include <valarray>
 
 #include <cxxopts.hpp>
-#include <indicators/progress_bar.hpp>
 #include <rapidcsv.h>
 
 #include "ariel_random/ariel_random.hpp"
@@ -30,7 +29,7 @@ using discrete_step = std::valarray<discrete_field>;
 
 using continuum_field = double;
 using continuum_point = std::valarray<continuum_field>;
-using continuum_direction = std::valarray<continuum_field>;
+using versor = std::valarray<continuum_field>;
 
 #define ZERO3D                                                                                     \
     { 0, 0, 0 }
@@ -48,8 +47,7 @@ auto axial_walker_factory() {
  * Factory method for a walker performing length 1 steps uniformly in any direcion.
  */
 auto omnidir_walker_factory() {
-    return Walker{continuum_point(ZERO3D),
-                  distributions::Uniform3DDirection<continuum_direction>()};
+    return Walker{continuum_point(ZERO3D), distributions::Uniform3DDirection<versor>()};
 }
 
 /**
@@ -66,7 +64,6 @@ template<typename WalkerFactory, typename URBG>
 void fill_walk_statistics(WalkerFactory walker_factory, URBG &rng, size_t n_blocks,
                           size_t block_size, size_t walk_length, rapidcsv::Document &table,
                           string &&section) {
-    using namespace indicators;
     auto walker = walker_factory();
     std::vector<double> distances(block_size);
     estimators::StatefulMean<double> mean_estimator;
@@ -135,6 +132,9 @@ int main(int argc, char const *argv[]) {
                          "continuum");
 
     table.RemoveColumn(table.GetColumnCount() - 1);
+    if (!fs::exists(OUTPUT_PATH.parent_path())) {
+        fs::create_directories(OUTPUT_PATH.parent_path());
+    }
     table.Save(OUTPUT_PATH);
 
 
