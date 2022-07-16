@@ -10,10 +10,7 @@
 
 #include "ariel_random/ariel_random.hpp"
 #include "config.hpp"
-#include "distributions/discrete.hpp"
-#include "distributions/uniform_angle.hpp"
 #include "estimators/mean.hpp"
-#include "walkers/walker.hpp"
 
 
 #define SECTION "03"
