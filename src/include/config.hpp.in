@@ -1,0 +1,12 @@
+#pragma once
+
+#define RESULTS_DIR "@PROJECT_SOURCE_DIR@/results/"
+#define DEFAULT_SAMPLE_SIZE 1E6
+#define DEFAULT_N_BLOCKS 1E2
+#define SEEDS_PATH "@PROJECT_SOURCE_DIR@/data/seeds/"
+#define PRIMES_PATH "@PROJECT_SOURCE_DIR@/data/primes/"
+#define LATTICES_PATH "@PROJECT_SOURCE_DIR@/data/lattices/"
+#define MD_SETTINGS_PATH "@PROJECT_SOURCE_DIR@/data/md_settings/"
+#define ISING_PATH "@PROJECT_SOURCE_DIR@/data/ising/"
+#define TSP_PATH "@PROJECT_SOURCE_DIR@/data/paths/"
+#define TESTS_PATH "@PROJECT_SOURCE_DIR@/tests/"

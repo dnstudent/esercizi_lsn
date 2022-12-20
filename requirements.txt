@@ -1,0 +1,14 @@
+numpy
+pandas
+matplotlib
+statsmodels
+notebook
+multiprocess
+tqdm
+seaborn
+scipy
+cartopy
+tensorflow
+scikit-learn
+ipywidgets=7.*
+conan=1.55

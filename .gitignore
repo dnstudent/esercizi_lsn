@@ -1,0 +1,24 @@
+# Project exclude paths
+/cmake-build-*/
+/.idea/
+/.vscode/
+/.cache/
+__pycache__/
+.DS_Store
+/bin/
+/lib/
+/profiling/
+/install/
+/sanitize/
+frames/
+/src/include/config.hpp
+*.pdf
+.ipynb_checkpoints/
+*.code-workspace
+*.csv
+*.hdf5
+*.tf
+*.xyz
+
+!results/08/**/*.csv
+!/results/10/**/*.csv
