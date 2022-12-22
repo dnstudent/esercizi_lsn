@@ -10,5 +10,5 @@ scipy
 cartopy
 tensorflow
 scikit-learn
-ipywidgets=7.*
-conan=1.55
+ipywidgets==7.*
+conan==1.55
