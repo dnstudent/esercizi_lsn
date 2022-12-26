@@ -70,7 +70,7 @@ TEST_CASE("Integrator") {
             const auto [result, n_blocks] = I.integrate_to(
                     [](const field &x) { return std::cos(x) * M_PI; }, 0.005, 10, rng);
             // Catch::Approx has a weird behavior when applied to 0
-            CHECK(std::get<0>(result) + 1 == Catch::Approx(1.0).epsilon(0.01));
+            CHECK(std::get<0>(result) + 1 == Catch::Approx(1.0).epsilon(0.1));
         }
     }
 }

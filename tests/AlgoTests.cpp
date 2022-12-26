@@ -9,6 +9,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <rapidcsv.h>
 
+#include "config.hpp"
 #include "molecular_systems/algos.hpp"
 #include "molecular_systems/data_types/settings.hpp"
 #include "molecular_systems/data_types/vectors.hpp"
@@ -24,7 +25,7 @@ TEST_CASE("Testing algorithms", "[algo]") {
         REQUIRE(PBC(std::abs(x3 - x2), box_edge) == Catch::Approx(0.1));
     }
     SECTION("autocorrelation") {
-        rapidcsv::Document flights("flights.csv");
+        rapidcsv::Document flights(TESTS_PATH "flights.csv");
         const std::vector<size_t> pass = flights.GetColumn<size_t>("passengers");
         std::vector<double> autoc(pass.size());
         utils::autocorrelation_fn(pass.cbegin(), pass.cend(), autoc.begin());
