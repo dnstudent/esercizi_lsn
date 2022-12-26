@@ -43,15 +43,15 @@ namespace ising {
             assert(n_spins > 2);
         }
 
-        Ising(std::initializer_list<spins::BinarySpin> state, VarSpace J, VarSpace h, VarSpace T)
-            : m_state(state), m_n_spins(m_state.size()), m_choosespin(0, m_n_spins - 1), m_J(J),
-              m_h(h), m_beta(1 / T) {
-            assert(m_n_spins > 2);
-        }
-
         Ising(const fs::path &state_path, VarSpace J, VarSpace h, VarSpace T)
             : m_state(read_state(state_path)), m_n_spins(m_state.size()),
               m_choosespin(0, m_n_spins - 1), m_J(J), m_h(h), m_beta(1 / T) {
+            assert(m_n_spins > 2);
+        }
+        
+        Ising(std::initializer_list<spins::BinarySpin> state, VarSpace J, VarSpace h, VarSpace T)
+            : m_state(state), m_n_spins(m_state.size()), m_choosespin(0, m_n_spins - 1), m_J(J),
+              m_h(h), m_beta(1 / T) {
             assert(m_n_spins > 2);
         }
 

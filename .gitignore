@@ -22,3 +22,5 @@ frames/
 
 !results/08/**/*.csv
 !/results/10/**/*.csv
+!/tests/*.csv
+!/tests/**/*.csv
