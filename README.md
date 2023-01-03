@@ -9,48 +9,79 @@ The root directory of the project is organized in 5 directories plus some suppor
 - `solutions/`: it contains jupyter notebooks presenting the exercises' solutions;
 - `src/`: it contains the C++ code 
 
+## How to display the exercises results
+Launch a jupyter server from the `solutions/` directory:
+```bash
+cd solutions
+jupyter notebook
+```
 
-## Project dependencies
-The following software needs to be installed to build the project:
-- a modern gcc compiler (supporting c++17);
+The jupyter notebooks that display the solutions to the exercises are stored under `solutions/`. Provided that a jupyter server is available to the user, every notebook should be ready for consultation.
+
+If a full recomputation of results is wanted instead, [the following section](#how-to-prepare-the-project-for-recomputation) presents which steps need to be taken in order to prepare the source tree and install python runtime dependencies.
+Running the notebooks then triggers recomputation, which may take a while.
+Many notebooks provide the option to use cached results setting the variable `USE_CACHED` to `True`: errors related to files not being found are usually related to the fact that solutions are not in cache. Try setting `USE_CACHED=False` if that is the case.
+
+## How to prepare the project for recomputation
+### Project dependencies
+The following software needs to be present on the computer in order to build the project:
+- a modern compiler supporting c++17 (the project was tested with gcc-10, gcc-12 and clang-14);
 - cmake >= 3.18;
 - an anaconda distribution;
 - an MPI distribution (both mpich and OpenMPI were tested).
 
-Other build dependencies are specified in:
-- "environment.yml" or "requirements.txt" (python dependencies; managed respectively by anaconda and pip);
-- "conanfile.txt" (C++ dependencies; managed by conan).
+Build and runtime dependencies, that will instead be installed in the following sections, are specified in:
+- "environment.yml" (for python dependencies; managed by anaconda);
+- "conanfile.txt" (for C++ dependencies; managed by conan, which will be installed by conan).
 
-Both these sets 
 
-## How to build the project
-After having installed the required build dependencies and cloned the current repository to a folder, the following steps must be followed:
-### 1. Create the conda environment and install python dependencies
+### How to build the project
+After having installed the required build dependencies and cloned the current repository to a folder, the following steps should be followed:
+#### 1. Create a conda environment and install python dependencies
 From the project root run:
 ```bash
-conda env create -f environment.yml -n <Your environment name>
+conda env create -f environment.yml -n <YourEnvName>
 ```
-This command create a conda environment named \<Your environment name\> and installs the python dependencies (+ conan).
+This command creates a conda environment named \<YourEnvName\> and installs the dependencies listed in "environment.yml".
 Now activate your environment:
 ```bash
-conda activate <Your environment name>
+conda activate <YourEnvName>
 ```
 
-### 2. Configure Conan and install C++ dependencies
-C++ dependencies are managed by [conan](https://conan.io). Create a build directory and move inside it:
+#### 2. Configure Conan and install C++ dependencies
+C++ dependencies are managed by [conan](https://conan.io).
+It was installed by conda during the previous step, and now it has to be configured:
+```bash
+conan profile new default --detect
+```
+the prompt may show a warning message starting with:
+```
+************************* WARNING: GCC OLD ABI COMPATIBILITY ***********************
+```
+In case, I suggest following the directions given in the warning and execute:
+```bash
+conan profile update settings.compiler.libcxx=libstdc++11 default
+```
+to make the software work properly with code compiled for recent versions of C++.
+
+Dependencies can now be installed.
+Start with creating a build directory:
 ```bash
 mkdir build
 cd build
 ```
-Conan has to be configured to properly install dependencies:
+where the cmake configuration files and the build tree will reside.
+Now install C++ dependencies running:
+```
+conan install -pr:h=default -pr:b=default --build=missing -s compiler.cppstd=17 ..
+```
 
-
-
-
-
-
-## How to display the exercises results
-The jupyter notebooks that compute and diplay the solutions to the exercises are stored in `solutions/`. Every notebook should be already configured to run as intended without user configuration.
-
-Many notebooks provide the option to use cached results setting the variable `USE_CACHED` to `True`: errors related to files not being found are usually related to the fact that computation has not already been performed. Try setting `USE_CACHED=False`.
+#### 3. Build the project using cmake
+Inside the `build/` directory created above run:
+```
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../
+cmake --build .
+cmake --install .
+```
+This should build and install the executables used to solve the exercises under the `bin/` directory in the project's root, ready to be used by the jupyter notebooks.
 

@@ -6,3 +6,6 @@ indicators/2.2
 
 [generators]
 cmake
+
+[layout]
+cmake_layout

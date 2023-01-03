@@ -1,0 +1,9 @@
+{
+    "version": 4,
+    "vendor": {
+        "conan": {}
+    },
+    "include": [
+        "/Users/davidenicoli/Local_Workspace/Uni/LabSiNum/esercizi_lsn/build/generators/CMakePresets.json"
+    ]
+}

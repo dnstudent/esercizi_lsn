@@ -6,7 +6,6 @@ conan_basic_setup(TARGETS)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
-#set(CMAKE_OUT_DIR "")
 
 
 find_package(MPI REQUIRED)
