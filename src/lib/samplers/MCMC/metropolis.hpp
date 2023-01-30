@@ -70,7 +70,7 @@ namespace samplers::mcmc {
             const auto candidate_logp = m_pdf.logp(candidate);
             if constexpr (is_stochastic<PDF>::value) { m_state_logp = m_pdf.logp(m_state); }
             ProbSpace step_log_prob;
-            // Checking at compile time whether the transition is has been marked as symmetric;
+            // Checking at compile time whether the transition has been marked as symmetric;
             // if it is unneded calculations are not performed.
             if constexpr (is_symmetric<ConditionalTransition>::value) {
                 step_log_prob = candidate_logp - m_state_logp;

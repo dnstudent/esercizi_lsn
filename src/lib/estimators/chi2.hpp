@@ -25,7 +25,7 @@ namespace estimators {
         template<typename It>
         constexpr Output operator()(It first, It last) {
             return std::transform_reduce(first, last, value(0), std::plus<>(), [&](const auto Oi) {
-                auto num = value(Oi) - m_expected_value;
+                const auto num = value(Oi) - m_expected_value;
                 return num * num / m_expected_value;
             });
         }

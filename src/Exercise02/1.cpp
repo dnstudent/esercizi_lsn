@@ -36,7 +36,7 @@ Value f1(const Value x) { return M_PI_2 * cos(x * M_PI_2); }
  * @param sigma Normal distribution's standard deviation.
  */
 Value f2(const Value x, const Value mu, const Value sigma) {
-    // Using a simmetric domain and a /2 factor for better performances, as both the integrand and the gaussian are simmetric.
+    // Using a simmetric domain and a /2 factor for better acceptance rate, as both the integrand and the gaussian are symmetric.
     if (-1 < x && x < 1) {
         const auto y = (x - mu) / sigma;
         return f1(x) * std::exp(y * y / 2) * M_SQRT_2_PI * sigma / 2;

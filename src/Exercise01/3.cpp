@@ -120,8 +120,7 @@ int main(int argc, char const *argv[]) {
         return 1;
     }
 
-    // ARandom rng(SEEDS_SOURCE, PRIMES_SOURCE, PRIMES_LINE);
-    std::minstd_rand rng(1);
+    ARandom rng(SEEDS_SOURCE, PRIMES_SOURCE, PRIMES_LINE);
     estimators::ProgAvg<Value> mean_estimator;
 
 

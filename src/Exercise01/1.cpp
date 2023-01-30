@@ -88,7 +88,6 @@ int main(int argc, char *argv[]) {
 
     // Stateful estimators for block statistics
     ProgAvg<Value> mean_estimator;
-    //    ProgVariance<Value> variance_estimator(0.5);
     ProgVariance<Value> variance_estimator;
     std::tuple estimators{mean_estimator, variance_estimator};
 
@@ -124,8 +123,6 @@ int main(int argc, char *argv[]) {
     /*-----------------------
      * X^2 Pearson statistics
      -----------------------*/
-
-
     // vector storing the results
     std::vector<Value> chi2(N_TRIALS);
     // buffer storing each trial's empirical distribution
